@@ -23,8 +23,8 @@ export default function calculateRouteEnergy(route, mode, carData) {
       distanceDriven: distanceKm, // segment distance in km
       averageSpeed: averageSpeedKmh, // segment average speed in km/h
     };
-
     const { fuelConsumption } = calculateFuelConsumption(params);
+    // console.log('fuelConsumption', fuelConsumption);
     totalFuelConsumption += fuelConsumption;
   }
 

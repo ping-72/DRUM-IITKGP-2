@@ -1,8 +1,9 @@
+// This file is a controller function that takes in routes and mode as parameters, and returns a geojson object and an array of routes. It fetches the shortest route from either Mapbox or Graphhopper API depending on the mode, calculates the energy consumption and exposure of the route, and returns the result. The flow is as follows:
 import calculateRouteEnergy from '../utils/calculateRouteEnergy';
 import calculateRouteExposureGraphhopper from '../utils/calculateRouteExposureGraphhopper';
 import calculateRouteExposureMapbox from '../utils/calculateRouteExposureMapbox';
 
-export default async function getShortestRoute(routes, mode, carData) {
+export default async function getShortestRoute(routes, mode) {
   const geojson = {
     type: 'Feature',
     properties: {},
@@ -12,10 +13,11 @@ export default async function getShortestRoute(routes, mode, carData) {
     },
   };
   console.log({ routes });
+
+  const carData = JSON.parse(localStorage.getItem('carData'));
   routes.sort((a, b) => a.distance - b.distance);
 
   if (mode === 'driving-traffic') {
-    // how to find the total energy consumed by the vehicle here..
     mode = 'car';
     const source = routes[0].waypoints[0];
     const destination = routes[0].waypoints[1];
@@ -28,7 +30,7 @@ export default async function getShortestRoute(routes, mode, carData) {
     const temp_routes = json.paths; // graphhopper routes between the same points
 
     temp_routes.sort((a, b) => a.distance - b.distance);
-    routes[0].totalEnergy = calculateRouteEnergy(temp_routes[0], mode);
+    routes[0].totalEnergy = calculateRouteEnergy(temp_routes[0], mode, carData);
     routes[0] = await calculateRouteExposureMapbox(routes[0]);
     geojson.geometry.coordinates = routes[0].geometry.coordinates;
   } else {

@@ -6,9 +6,6 @@ import GetCarInformation from './CarInfo/getCarInfo.jsx';
 import { setupMap, addMarkerToMap } from './utils/mapUtils.js';
 import prettyMilliseconds from 'pretty-ms';
 import prettyMetric from 'pretty-metric';
-
-// import Instruction from './Instruction.js';
-
 import { getAllRoutes, getRoutes } from './controllers/routeHandlers.js';
 
 export default function MapDrawer() {
@@ -24,6 +21,7 @@ export default function MapDrawer() {
   const [distance, setDistance] = useState(0);
   const [time, setTime] = useState(0);
   const [exposure, setExposure] = useState(0);
+  const [energyRequired, setEnergyRequired] = useState(0);
   const [instructions, setInstructions] = useState([]);
 
   const carData = useCar();
@@ -53,7 +51,7 @@ export default function MapDrawer() {
       <input id="my-drawer" type="checkbox" className="drawer-toggle" onClick={() => setIsExpanded(!isExpanded)} />
 
       <div className="drawer-content">
-        {/* label for the drawer */}
+        {/* Label for the drawer */}
         <label htmlFor="my-drawer" className="btn drawer-button btn-secondary btn-sm right-12 top-2 absolute z-40">
           {isExpanded ? 'Close' : 'Open'}
           {isExpanded ? (
@@ -90,10 +88,10 @@ export default function MapDrawer() {
       <div className="drawer-side">
         <label htmlFor="my-drawer" className="drawer-overlay"></label>
         <div className="menu p-4 bg-white shadow-lg w-10/12 md:w-1/3 lg:w-1/4 rounded-md ml-4 m-2">
-          <h1 className="text-lg font-semibold title-font text-center border-b-2 pb-2 mx-auto mb-4 text-gray-800">DRUM - IIT KGP</h1>
+          {/* Replaced h1 with div */}
+          <div className="text-lg font-semibold title-font text-center border-b-2 pb-2 mx-auto mb-4 text-gray-800">DRUM - IIT KGP</div>
           <form>
             <div className="flex flex-col space-y-4 items-center">
-              {/* --------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
               {/* Source Input */}
               <>
                 <input
@@ -178,7 +176,6 @@ export default function MapDrawer() {
                   )}
                 </div>
               </>
-              {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
               {/* Mode Select */}
               <select
                 className="select select-sm select-bordered bg-gray-100 text-gray-800 w-full max-w-xs"
@@ -191,14 +188,8 @@ export default function MapDrawer() {
                   -- Select Mode of Transport --
                 </option>
                 <option value="driving-traffic">Car</option>
-                {/* <option value="scooter">Motorbike</option>
-                <option value="bike">Cycling</option>
-                <option value="foot">Walking</option> */}
               </select>
-              {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
-              {/* Important features (and possibly car info) */}
-              {/* Import Car Info */}
-              {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
+              {/* Route Preference & Color Info */}
               <div className="flex flex-row justify-evenly items-center w-full max-w-xs">
                 <select
                   className="select select-sm select-bordered bg-gray-100 text-gray-800 w-full"
@@ -258,7 +249,6 @@ export default function MapDrawer() {
                   </div>
                 </div>
               </div>
-              {/* ------------------------------------------------------------------------------------------------------------------------------------------------------------- */}
               <br />
               <>
                 <div className="flex flex-col justify-evenly items-center w-full max-w-xs border rounded-md p-1 border-gray-300">
@@ -314,6 +304,7 @@ export default function MapDrawer() {
                       setTime,
                       setInstructions,
                       setExposure,
+                      setEnergyRequired,
                       setFastestRoute,
                       setShortestRoute,
                       setLeapRoute,
@@ -364,13 +355,13 @@ export default function MapDrawer() {
               </div>
             )}
             {routePreference !== 'all' && (
-              <div className="collapse mt-2">
-                <input type="checkbox" />
+              <div className="collapse mt-2 ">
+                {/* <input type="checkbox" /> */}
                 <div className="collapse-title text-xl font-medium text-center underline text-gray-800">Instructions</div>
-                <div className="collapse-content bg-gray-50 p-4 rounded-md">
+                <div className=" bg-gray-50 pl-4 rounded-md pt-0 h-40 ">
                   {instructions.length > 0 && !isLoading ? (
-                    <div className="overflow-auto h-40">
-                      <ol className="list-decimal list-inside space-y-2">
+                    <div className="overflow-y-scroll max-h-96">
+                      <ol className=" space-y-2">
                         {instructions.map((instruction, index) => (
                           <li key={index}>
                             <Instruction index={index} instruction={instruction} mode={mode} />
@@ -404,12 +395,14 @@ export default function MapDrawer() {
                 </div>
               </div>
             )}
+
+            <br />
             <div className="collapse mt-2">
-              <input type="checkbox" />
+              {/* <input type="checkbox" /> */}
               <div className="collapse-title text-xl font-medium text-center underline text-gray-800">Route Details</div>
-              <div className="collapse-content bg-gray-50 p-4 rounded-md">
+              <div className=" bg-gray-50 pl-4 rounded-md">
                 {routePreference === 'all' ? (
-                  <div className="overflow-auto h-72 space-y-4">
+                  <div className="overflow-auto max-h-96 space-y-2">
                     {/* Details for each route type */}
                     <div>
                       <div className="font-bold underline text-gray-800">Shortest Route</div>
@@ -417,7 +410,7 @@ export default function MapDrawer() {
                         <li>Distance: {prettyMetric(shortestRoute.distance).humanize()}</li>
                         <li>Time Taken: {shortestRoute.time && prettyMilliseconds(shortestRoute.time)}</li>
                         <li>Total Exposure: {shortestRoute.totalExposure?.toFixed(2)} µg/㎥</li>
-                        <li>Energy Required: {shortestRoute.totalEnergy?.toFixed(2)} kJ</li>
+                        <li>Energy Required: {shortestRoute.totalEnergy?.toFixed(2)} L fuel</li>
                       </ul>
                     </div>
                     <div>
@@ -430,7 +423,7 @@ export default function MapDrawer() {
                             prettyMilliseconds(fastestRoute.duration * 1000 || fastestRoute.time)}
                         </li>
                         <li>Total Exposure: {fastestRoute.totalExposure?.toFixed(2)} µg/㎥</li>
-                        <li>Energy Required: {fastestRoute.totalEnergy?.toFixed(2)} kJ</li>
+                        <li>Energy Required: {fastestRoute.totalEnergy?.toFixed(2)} L fuel</li>
                       </ul>
                     </div>
                     <div>
@@ -439,7 +432,7 @@ export default function MapDrawer() {
                         <li>Distance: {prettyMetric(leapRoute.distance).humanize()}</li>
                         <li>Time Taken: {leapRoute.time && prettyMilliseconds(leapRoute.time)}</li>
                         <li>Total Exposure: {leapRoute.totalExposure?.toFixed(2)} µg/㎥</li>
-                        <li>Energy Required: {leapRoute.totalEnergy?.toFixed(2)} kJ</li>
+                        <li>Energy Required: {leapRoute.totalEnergy?.toFixed(2)} L fuel</li>
                       </ul>
                     </div>
                     <div>
@@ -448,7 +441,7 @@ export default function MapDrawer() {
                         <li>Distance: {prettyMetric(leastCarbonRoute.distance).humanize()}</li>
                         <li>Time Taken: {leastCarbonRoute.time && prettyMilliseconds(leastCarbonRoute.time)}</li>
                         <li>Total Exposure: {leastCarbonRoute.totalExposure?.toFixed(2)} µg/㎥</li>
-                        <li>Energy Required: {leastCarbonRoute.totalEnergy?.toFixed(2)} kJ</li>
+                        <li>Energy Required: {leastCarbonRoute.totalEnergy?.toFixed(2)} L fuel</li>
                       </ul>
                     </div>
                     <div>
@@ -461,7 +454,7 @@ export default function MapDrawer() {
                             prettyMilliseconds(balancedRoute.time || balancedRoute.duration * 1000)}
                         </li>
                         <li>Total Exposure: {balancedRoute.totalExposure?.toFixed(2)} µg/㎥</li>
-                        <li>Energy Required: {balancedRoute.totalEnergy?.toFixed(2)} kJ</li>
+                        <li>Energy Required: {balancedRoute.totalEnergy?.toFixed(2)} L fuel</li>
                       </ul>
                     </div>
                   </div>
@@ -503,11 +496,11 @@ export default function MapDrawer() {
                     {!['shortest', 'fastest', 'leap', 'emission', 'balanced'].includes(routePreference) && (
                       <li>Exposure: No Route Selected µg/㎥</li>
                     )}
-                    {routePreference === 'leap' && <li>Energy Required: {leapRoute.totalEnergy?.toFixed(2)} kJ</li>}
-                    {routePreference === 'balanced' && <li>Energy Required: {balancedRoute.totalEnergy?.toFixed(2)} kJ</li>}
-                    {routePreference === 'shortest' && <li>Energy Required: {shortestRoute.totalEnergy?.toFixed(2)} kJ</li>}
-                    {routePreference === 'fastest' && <li>Energy Required: {fastestRoute.totalEnergy?.toFixed(2)} kJ</li>}
-                    {routePreference === 'emission' && <li>Energy Required: {leastCarbonRoute.totalEnergy?.toFixed(2)} kJ</li>}
+                    {routePreference === 'leap' && <li>Energy Required: {leapRoute.totalEnergy?.toFixed(2)} L fuel</li>}
+                    {routePreference === 'balanced' && <li>Energy Required: {balancedRoute.totalEnergy?.toFixed(2)} L fuel</li>}
+                    {routePreference === 'shortest' && <li>Energy Required: {shortestRoute.totalEnergy?.toFixed(2)} L fuel</li>}
+                    {routePreference === 'fastest' && <li>Energy Required: {fastestRoute.totalEnergy?.toFixed(2)} L fuel</li>}
+                    {routePreference === 'emission' && <li>Energy Required: {leastCarbonRoute.totalEnergy?.toFixed(2)} L fuel</li>}
                     {!['shortest', 'fastest', 'leap', 'emission', 'balanced'].includes(routePreference) && (
                       <li>Energy Required: No Route Selected</li>
                     )}

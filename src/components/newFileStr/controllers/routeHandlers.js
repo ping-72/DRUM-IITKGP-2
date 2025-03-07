@@ -5,143 +5,43 @@ import getFastestRoute from '../../../controllers/getFastestRoute';
 import getLeapRoute from '../../../controllers/getLeapRoute';
 import getBalancedRoute from '../../../controllers/getBalancedRoute';
 import getLeastCarbonRoute from '../../../controllers/getLeastCarbonRoute';
+import { getAllRoutesLayered } from './allRoutesHandler';
 
 export async function getAllRoutes({
   source,
   destination,
   mode,
-  routePreference, // fastest, shortest, leap, balanced, leastCarbon
+  routePreference,
+  setDistance,
+  setTime,
+  setInstructions,
+  setExposure,
   setFastestRoute,
   setShortestRoute,
   setLeapRoute,
   setBalancedRoute,
   setLeastCarbonRoute,
   setIsLoading,
+  carData,
 }) {
-  console.log('Inside getAllRoutes...');
-  let temp_mode = mode;
-  let temp_routePreference = routePreference;
-
-  // Remove any existing route layers from the map
-  let layers = window.$map.getStyle().layers;
-  layers.forEach((layer) => {
-    if (layer.id.includes('-route')) {
-      window.$map.removeLayer(layer.id);
-      window.$map.removeSource(layer.id);
-    }
+  getAllRoutesLayered({
+    source,
+    destination,
+    mode,
+    routePreference,
+    setDistance,
+    setTime,
+    setInstructions,
+    setExposure,
+    setFastestRoute,
+    setShortestRoute,
+    setLeapRoute,
+    setBalancedRoute,
+    setLeastCarbonRoute,
+    setIsLoading,
+    carData,
   });
-
-  let geojson, routes;
-
-  // Fastest Route
-  temp_routePreference = 'fastest';
-  if (temp_mode === 'car') temp_mode = 'driving-traffic';
-  else if (temp_mode === 'truck') temp_mode = 'driving-traffic';
-
-  if (temp_mode.includes('traffic')) {
-    routes = await getMapboxRoutes(source, destination);
-  } else {
-    routes = await getGraphhopperRoutes(temp_mode, source, destination);
-  }
-  ({ geojson, routes } = await getFastestRoute(routes, temp_mode));
-
-  const fastestRouteTime = routes[0].time;
-  const fastestRouteDistance = routes[0].distance;
-
-  let routeId = `${temp_mode}-${temp_routePreference}-${source.position[0]}-${source.position[1]}-${destination.position[0]}-${destination.position[1]}-route-all`;
-  if (window.$map.getSource(routeId)) {
-    window.$map.getSource(routeId).setData(geojson);
-    setFastestRoute(routes[0]);
-  } else {
-    setFastestRoute(routes[0]);
-    displayRoute(geojson, source, destination, routeId, 'fastest');
-  }
-
-  // Shortest Route
-  temp_routePreference = 'shortest';
-  if (temp_mode === 'driving-traffic') {
-    routes = await getMapboxRoutes(source, destination);
-  } else {
-    routes = await getGraphhopperRoutes(temp_mode, source, destination);
-  }
-  ({ geojson, routes } = await getShortestRoute(routes, temp_mode));
-  routeId = `${temp_mode}-${temp_routePreference}-${source.position[0]}-${source.position[1]}-${destination.position[0]}-${destination.position[1]}-route-all`;
-  if (window.$map.getSource(routeId)) {
-    window.$map.getSource(routeId).setData(geojson);
-    setShortestRoute(routes[0]);
-  } else {
-    setShortestRoute(routes[0]);
-    displayRoute(geojson, source, destination, routeId, 'shortest');
-  }
-
-  // LEAP Route
-  temp_routePreference = 'leap';
-  if (temp_mode === 'truck-traffic') temp_mode = 'truck';
-  else if (temp_mode === 'driving-traffic') temp_mode = 'car';
-  routes = await getGraphhopperRoutes(temp_mode, source, destination);
-  ({ geojson, routes } = await getLeapRoute(routes, temp_mode));
-  if (temp_mode === 'car') {
-    routes[0].time = (routes[0].distance / fastestRouteDistance) * fastestRouteTime;
-  }
-  // (Note: the original code adjusts the distance/time if too small)
-  if (routes[0].distance < routes[0].distance) {
-    routes[0].distance = 1.01 * routes[0].distance;
-  }
-  if (routes[0].time < fastestRouteTime) {
-    routes[0].time = 1.01 * fastestRouteTime;
-  }
-  routeId = `${temp_mode}-${temp_routePreference}-${source.position[0]}-${source.position[1]}-${destination.position[0]}-${destination.position[1]}-route-all`;
-  if (window.$map.getSource(routeId)) {
-    setLeapRoute(routes[0]);
-    window.$map.getSource(routeId).setData(geojson);
-  } else {
-    setLeapRoute(routes[0]);
-    displayRoute(geojson, source, destination, routeId, 'leap');
-  }
-
-  // Balanced Route
-  temp_routePreference = 'balanced';
-  if (temp_mode === 'car') temp_mode = 'driving-traffic';
-  else if (temp_mode === 'truck') temp_mode = 'truck-traffic';
-  if (['foot', 'bike', 'scooter'].includes(temp_mode)) {
-    routes = await getGraphhopperRoutes(temp_mode, source, destination);
-  } else {
-    routes = await getMapboxRoutes(source, destination);
-  }
-  ({ geojson, routes } = await getBalancedRoute(routes, temp_mode));
-  routeId = `${temp_mode}-${temp_routePreference}-${source.position[0]}-${source.position[1]}-${destination.position[0]}-${destination.position[1]}-route-all`;
-  if (window.$map.getSource(routeId)) {
-    window.$map.getSource(routeId).setData(geojson);
-    setBalancedRoute(routes[0]);
-    setIsLoading(false);
-  } else {
-    setBalancedRoute(routes[0]);
-    displayRoute(geojson, source, destination, routeId, 'balanced');
-    setIsLoading(false);
-  }
-
-  // Least Carbon Emission Route
-  temp_routePreference = 'emission';
-  if (temp_mode === 'driving-traffic') temp_mode = 'car';
-  routes = await getGraphhopperRoutes(temp_mode, source, destination);
-  ({ geojson, routes } = await getLeastCarbonRoute(source, destination, temp_mode));
-  if (temp_mode === 'car') {
-    routes[0].time = (routes[0].distance / fastestRouteDistance) * fastestRouteTime;
-  }
-  if (routes[0].distance < routes[0].distance) {
-    routes[0].distance = 1.01 * routes[0].distance;
-  }
-  if (routes[0].time < fastestRouteTime) {
-    routes[0].time = 1.01 * fastestRouteTime;
-  }
-  routeId = `${temp_mode}-${temp_routePreference}-${source.position[0]}-${source.position[1]}-${destination.position[0]}-${destination.position[1]}-route-all`;
-  if (window.$map.getSource(routeId)) {
-    setLeastCarbonRoute(routes[0]);
-    window.$map.getSource(routeId).setData(geojson);
-  } else {
-    setLeastCarbonRoute(routes[0]);
-    displayRoute(geojson, source, destination, routeId, 'emission');
-  }
+  return;
 }
 
 export async function getRoutes({
@@ -153,6 +53,7 @@ export async function getRoutes({
   setTime,
   setInstructions,
   setExposure,
+  setEnergyRequired,
   setFastestRoute,
   setShortestRoute,
   setLeapRoute,
@@ -224,6 +125,7 @@ export async function getRoutes({
           setInstructions(routes[0].instructions);
         }
         setExposure(routes[0].totalExposure);
+        routes[0].energyRequired && setEnergyRequired(routes[0].energyRequired);
         window.$map.getStyle().layers.forEach((layer) => {
           if (layer.id.includes('-route')) {
             window.$map.removeLayer(layer.id);

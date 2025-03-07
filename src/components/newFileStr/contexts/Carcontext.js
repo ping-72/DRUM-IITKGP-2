@@ -4,20 +4,24 @@ const CarContext = createContext();
 
 export const CarProvider = ({ children }) => {
   // Initialize carData from localStorage if available,
-  const [carData, setCarData] = useState(() => ({
-    company: 'Default Company',
-    model: 'Default Model',
-    productionYear: 2020,
-    distanceDriven: 0,
-    averageSpeed: 0,
-    fuelType: 'Petrol',
-    carType: 'Sedan',
-    mileage: '20 km/l',
-  }));
+  const [carData, setCarData] = useState(() => {
+    const storedCarData = localStorage.getItem('carData');
+    return storedCarData
+      ? JSON.parse(storedCarData)
+      : {
+          company: 'Default Company',
+          model: 'Default Model',
+          productionYear: 2020,
+          distanceDriven: 100,
+          averageSpeed: 50,
+          fuelType: 'Petrol',
+          carType: 'Sedan',
+          mileage: '20 km/l',
+        };
+  });
 
   useEffect(() => {
     localStorage.setItem('carData', JSON.stringify(carData));
-    console.log('Car Data:', carData);
   }, [carData]);
 
   const updateCarData = (newData) => {
@@ -31,6 +35,6 @@ export const CarProvider = ({ children }) => {
 
 export const useCar = () => {
   const context = useContext(CarContext);
-  if (!CarContext) throw new Error('useCar must be used within a CarProvider');
+  if (!context) throw new Error('useCar must be used within a CarProvider');
   return context;
 };

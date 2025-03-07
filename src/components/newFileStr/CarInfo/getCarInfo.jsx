@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Draggable } from 'react-drag-reorder';
 import CarData from '../carMileageData/mileageData.json';
 import { CarProvider, useCar } from '../contexts/Carcontext';
 
@@ -9,17 +8,18 @@ const initialCompany = carCompanies[0];
 const initialModels = CarData[initialCompany];
 const initialModel = initialModels[0].model;
 
-// Custom reorder helper
+// Custom reorder helper: removes item from startIndex and inserts it at endIndex
 const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
-  return result;
+  const newList = Array.from(list);
+  const [removed] = newList.splice(startIndex, 1);
+  newList.splice(endIndex, 0, removed);
+  return newList;
 };
 
 const GetCarInformation = ({ onPredict }) => {
   // Access carData and updateCarData from the CarProvider
   const { carData, updateCarData } = useCar();
+  const navigate = useNavigate();
 
   // Set default values if not already present in the context
   carData.company = carData.company || initialCompany;
@@ -30,8 +30,6 @@ const GetCarInformation = ({ onPredict }) => {
   carData.averageSpeed = carData.averageSpeed || '50';
   carData.mileage = carData.mileage || '24.3 km/l';
 
-  const navigate = useNavigate();
-
   const handleCarDataChange = (e) => {
     const { name, value } = e.target;
     updateCarData({ [name]: value });
@@ -40,17 +38,31 @@ const GetCarInformation = ({ onPredict }) => {
   // Local state for route preferences
   const [preferences, setPreferences] = useState(['Shortest', 'Faster', 'Least Exposure', 'Least Emission']);
 
-  // Update the preferences order when the drag position changes
-  const handlePosChange = (currentPos, newPos) => {
-    const newOrder = reorder(preferences, currentPos, newPos);
-    setPreferences(newOrder);
+  // Update and persist the preferences order
+  const handleUp = (index) => {
+    if (index > 0) {
+      const newOrder = reorder(preferences, index, index - 1);
+      setPreferences(newOrder);
+    }
   };
 
-  // Get the models for the currently selected company.
-  let modelsForCompany = CarData[carData.company] || [];
+  const handleDown = (index) => {
+    if (index < preferences.length - 1) {
+      const newOrder = reorder(preferences, index, index + 1);
+      setPreferences(newOrder);
+    }
+  };
+
   useEffect(() => {
-    modelsForCompany = CarData[carData.company] || [];
-  }, [carData]);
+    // Optionally persist the order to localStorage
+    localStorage.setItem('routePreferences', JSON.stringify(preferences));
+  }, [preferences]);
+
+  // Get the models for the currently selected company.
+  const [modelsForCompany, setModelsForCompany] = useState(CarData[carData.company] || []);
+  useEffect(() => {
+    setModelsForCompany(CarData[carData.company] || []);
+  }, [carData.company]);
 
   return (
     <div className="px-4 md:px-40 flex flex-1 justify-center py-5">
@@ -143,26 +155,24 @@ const GetCarInformation = ({ onPredict }) => {
           </label>
         </div>
 
-        {/* User-preference for custom routing (drag and reorder options) */}
+        {/* Route Preferences: Simple Move Up/Down */}
         <div className="flex flex-col max-w-[480px] gap-4 px-4 py-3">
           <h2 className="text-xl font-bold">Route Preferences</h2>
-          <Draggable onPosChange={handlePosChange}>
-            {preferences.map((preference, index) => (
-              <div key={index} className="flex items-center gap-2 border border-black rounded p-2">
-                <span className="flex justify-between w-full">
-                  <button disabled className="px-2 py-1 rounded-sm ">
-                    <span role="img" aria-label="up">
-                      ⬆️
-                    </span>
-                  </button>
-                  <span className="flex-1 text-center">{preference}</span>
-                  <button disabled className="text-black px-2 py-1 rounded-sm ">
-                    <span> ⬇️ </span>
-                  </button>
-                </span>
-              </div>
-            ))}
-          </Draggable>
+          {preferences.map((preference, index) => (
+            <div key={index} className="flex items-center gap-2 border border-black rounded p-2">
+              <button type="button" onClick={() => handleUp(index)} disabled={index === 0} className=" rounded-sm hover:bg-gray-400">
+                ⬆️{' '}
+              </button>
+              <span className="flex-1 text-center">{preference}</span>
+              <button
+                type="button"
+                onClick={() => handleDown(index)}
+                disabled={index === preferences.length - 1}
+                className=" rounded-sm hover:bg-gray-400">
+                ⬇️
+              </button>
+            </div>
+          ))}
         </div>
 
         {/* Submit and Navigation Buttons */}
