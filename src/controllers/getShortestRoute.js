@@ -2,6 +2,7 @@
 import calculateRouteEnergy from '../utils/calculateRouteEnergy';
 import calculateRouteExposureGraphhopper from '../utils/calculateRouteExposureGraphhopper';
 import calculateRouteExposureMapbox from '../utils/calculateRouteExposureMapbox';
+import calculateCCT from '../utils/calculateCCT';
 
 export default async function getShortestRoute(routes, mode) {
   const geojson = {
@@ -38,6 +39,7 @@ export default async function getShortestRoute(routes, mode) {
     routes[0] = await calculateRouteExposureGraphhopper(routes[0]);
     geojson.geometry.coordinates = routes[0].points.coordinates;
   }
+  alert("Shortest round has base Carbon credits of Rs " + calculateCCT(routes[0].distance))
 
   return { geojson, routes };
 }
