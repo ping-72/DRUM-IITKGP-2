@@ -1,8 +1,8 @@
 // This file is a controller function that takes in routes and mode as parameters, and returns a geojson object and an array of routes. It fetches the shortest route from either Mapbox or Graphhopper API depending on the mode, calculates the energy consumption and exposure of the route, and returns the result. The flow is as follows:
-import calculateRouteEnergy from '../utils/calculateRouteEnergy';
-import calculateRouteExposureGraphhopper from '../utils/calculateRouteExposureGraphhopper';
-import calculateRouteExposureMapbox from '../utils/calculateRouteExposureMapbox';
-import calculateCCT from '../utils/calculateCCT';
+import calculateRouteEnergy from '../utils/calculateRouteEnergy.js';
+import calculateRouteExposureGraphhopper from '../utils/calculateRouteExposureGraphhopper.js';
+import calculateRouteExposureMapbox from '../utils/calculateRouteExposureMapbox.js';
+import calculateCCT from '../utils/calculateCCT.js';
 
 export default async function getShortestRoute(routes, mode) {
   const geojson = {

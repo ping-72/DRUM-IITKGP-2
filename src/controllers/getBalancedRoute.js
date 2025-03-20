@@ -1,6 +1,6 @@
-import getLeapRoute from './getLeapRoute'
-import calculateRouteExposureMapbox from '../utils/calculateRouteExposureMapbox'
-import calculateRouteEnergy from '../utils/calculateRouteEnergy'
+import getLeapRoute from './getLeapRoute.js'
+import calculateRouteExposureMapbox from '../utils/calculateRouteExposureMapbox.js'
+import calculateRouteEnergy from '../utils/calculateRouteEnergy.js'
 
 export default async function getBalancedRoute(routes, mode) {
     if (mode == 'scooter' || mode == 'foot' || mode == 'bike') {

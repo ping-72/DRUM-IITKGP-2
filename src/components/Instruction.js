@@ -1,6 +1,6 @@
 import prettyMilliseconds from 'pretty-ms'
 import {useRef} from 'react'
-const prettyMetric = require('pretty-metric')
+import prettyMetric from 'pretty-metric'
 
 export default function Instruction({ index, instruction, mode }) {
     const text = useRef('')

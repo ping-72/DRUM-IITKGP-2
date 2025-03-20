@@ -1,6 +1,6 @@
 // Fetching routes data from Mapbox and Graphhopper APIs
 
-const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
+import mapboxgl from 'mapbox-gl';
 
 async function getMapboxRoutes(source, destination) {
   const query = await fetch(

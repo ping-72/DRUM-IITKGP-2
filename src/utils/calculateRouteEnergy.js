@@ -1,4 +1,4 @@
-import { calculateFuelConsumption } from './EmissionByCar';
+import { calculateFuelConsumption } from './EmissionByCar.js';
 
 export default function calculateRouteEnergy(route, mode, carData) {
   let totalFuelConsumption = 0;

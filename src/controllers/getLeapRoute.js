@@ -1,5 +1,5 @@
-import calculateRouteEnergy from '../utils/calculateRouteEnergy';
-import calculateRouteExposureGraphhopper from '../utils/calculateRouteExposureGraphhopper';
+import calculateRouteEnergy from '../utils/calculateRouteEnergy.js';
+import calculateRouteExposureGraphhopper from '../utils/calculateRouteExposureGraphhopper.js';
 
 // Now carData will be passed as a parameter.
 export default async function getLeapRoute(routes, mode, carData) {

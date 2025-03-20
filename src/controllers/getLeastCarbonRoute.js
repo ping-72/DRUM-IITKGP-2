@@ -1,9 +1,9 @@
 // LCR: Least Carbon Route
 // This file is fetching routes from Graphhopper API, calculating the exposure of each route using Graphhopper points, calculating the total energy consumed by the vehicle using calculateRouteEnergy and sorting the routes based on the total energy, and finally returning the geojson of the route with the least carbon emissions.
 
-import calculateRouteExposureGraphhopper from '../utils/calculateRouteExposureGraphhopper';
-import getMassfromMode from '../utils/getMassfromMode';
-import calculateRouteEnergy from '../utils/calculateRouteEnergy';
+import calculateRouteExposureGraphhopper from '../utils/calculateRouteExposureGraphhopper.js';
+import getMassfromMode from '../utils/getMassfromMode.js';
+import calculateRouteEnergy from '../utils/calculateRouteEnergy.js';
 
 export default async function getLeastCarbonRoute(source, destination, temp_mode) {
   if (source.location === undefined || destination.location === undefined) {

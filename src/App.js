@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 // import MapDrawer from './components/MapDrawer';
-import MapDrawer from './components/newFileStr/MapDrawer';
-import Homepage from './components/newFileStr/Homepage';
-import { CarProvider } from './components/newFileStr/contexts/Carcontext';
+import MapDrawer from './components/newFileStr/MapDrawer.jsx';
+import Homepage from './components/newFileStr/Homepage.jsx';
+import { CarProvider } from './components/newFileStr/contexts/Carcontext.js';
 
 export default function App() {
   return (

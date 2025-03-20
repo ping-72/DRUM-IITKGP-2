@@ -1,5 +1,5 @@
-import convertAQIToPM25 from './convertAqiToPm25'
-import fetchAqiData from '../services/fetchAqiData'
+import convertAQIToPM25 from './convertAqiToPm25.js'
+import fetchAqiData from '../services/fetchAqiData.js'
 
 export default async function calculateRouteExposureGraphhopper(route) {
     // fetch the aqi values for the points in the routes

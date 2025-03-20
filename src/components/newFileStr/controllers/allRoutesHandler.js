@@ -1,10 +1,10 @@
-import { displayRoute } from '../utils/mapUtils';
-import { getMapboxRoutes, getGraphhopperRoutes } from '../../../services/fetchRoutesData';
-import getShortestRoute from '../../../controllers/getShortestRoute';
-import getFastestRoute from '../../../controllers/getFastestRoute';
-import getLeapRoute from '../../../controllers/getLeapRoute';
-import getBalancedRoute from '../../../controllers/getBalancedRoute';
-import getLeastCarbonRoute from '../../../controllers/getLeastCarbonRoute';
+import { displayRoute } from '../utils/mapUtils.js';
+import { getMapboxRoutes, getGraphhopperRoutes } from '../../../services/fetchRoutesData.js';
+import getShortestRoute from '../../../controllers/getShortestRoute.js';
+import getFastestRoute from '../../../controllers/getFastestRoute.js';
+import getLeapRoute from '../../../controllers/getLeapRoute.js';
+import getBalancedRoute from '../../../controllers/getBalancedRoute.js';
+import getLeastCarbonRoute from '../../../controllers/getLeastCarbonRoute.js';
 
 export async function getAllRoutesLayered({
   source,
